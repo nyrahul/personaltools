@@ -3,6 +3,7 @@
 2. cc1310 specs and the regulatory conditions
 3. preparing cc1310 for india deployment, configuration changes
 4. Long range tests with different data rates
+5. Measure variation from the "TI Range Estimation" spreadsheet based on Friis-Equation & 2-Ray Ground Reflection Model.
 5. Open source apps used for testing this conditions
 
 ## Terminlogies
