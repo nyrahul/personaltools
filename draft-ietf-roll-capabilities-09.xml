@@ -1,0 +1,1006 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+     which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!-- One method to get references from the online citation libraries.
+     There has to be one entity for each item to be referenced.
+     An alternate method (rfc include) is described in the references. -->
+
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
+<!ENTITY RFC6550 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6550.xml">
+<!ENTITY RFC6551 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6551.xml">
+<!ENTITY RFC6345 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6345.xml">
+<!ENTITY RFC6775 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6775.xml">
+<!ENTITY RFC5191 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5191.xml">
+<!ENTITY RFC8138 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.8138.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="std" docName="draft-ietf-roll-capabilities-09" ipr="trust200902">
+    <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+      <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+
+    <title abbrev="RPL Capabilities">RPL Capabilities</title>
+
+    <author fullname="Rahul Arvind Jadhav" initials="R.A." role="editor" surname="Jadhav">
+        <organization>Huawei</organization>
+        <address>
+            <postal>
+                <street>Kundalahalli Village, Whitefield,</street>
+                <city>Bangalore</city>
+                <region>Karnataka</region>
+                <code>560037</code>
+                <country>India</country>
+            </postal>
+            <phone>+91-080-49160700</phone>
+            <email>rahul.ietf@gmail.com</email>
+        </address>
+    </author>
+    <author initials="P" surname="Thubert" fullname="Pascal Thubert">
+        <organization abbrev="Cisco">Cisco Systems, Inc</organization>
+        <address>
+            <postal>
+                <street>Building D</street>
+                <street>45 Allee des Ormes - BP1200 </street>
+                <city>MOUGINS - Sophia Antipolis</city>
+                <code>06254</code>
+                <country>France</country>
+            </postal>
+            <phone>+33 497 23 26 34</phone>
+            <email>pthubert@cisco.com</email>
+        </address>
+    </author>
+    <author initials="M." surname="Richardson" fullname="Michael Richardson">
+        <organization>Sandelman Software Works</organization>
+        <address>
+            <email>mcr+ietf@sandelman.ca</email>
+        </address>
+    </author>
+    <author fullname="Rabi Narayan Sahoo" initials="R.N." surname="Sahoo">
+        <organization>Juniper</organization>
+        <address>
+            <email>rabinarayans0828@gmail.com</email>
+        </address>
+    </author>
+
+    <date/>
+
+    <area>Routing</area>
+
+    <workgroup>ROLL</workgroup>
+
+    <!-- WG name at the upperleft corner of the doc,
+         IETF is fine for individual submissions.
+     If this element is not present, the default is "Network Working Group",
+         which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+    <keyword>RPL, mesh, MOP, MOPex, extension, capability, capabilities</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+        <t>
+            This draft enables the discovery, advertisement and query of
+            capabilities for RPL nodes.
+        </t>
+    </abstract>
+</front>
+
+<middle>
+    <section title="Introduction">
+        <t>
+            RPL <xref target="RFC6550"/> specifies a proactive distance-vector
+            based routing scheme. The protocol creates a DAG-like structure
+            which operates with a given "Mode of Operation" (MOP) determining the
+            minimal and mandatory set of primitives to be supported by all the
+            participating nodes.
+        </t>
+        <t>
+            This document adds a notion of capabilities using which nodes in the
+            network could inform its peers about its additional capabilities.
+            This document highlights the differences of capabilities from that
+            of Mode of operation and explains the necessity of it.
+        </t>
+
+        <section title="Requirements Language and Terminology">
+            <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+                NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+                in this document are to be interpreted as described in <xref
+                    target="RFC2119">RFC 2119</xref>.</t>
+
+            <t>
+                MOP: Mode of Operation. Identifies the MOP of the RPL Instance
+                as administratively provisioned at and distributed by the DODAG
+                root.
+            </t>
+
+            <t>
+                MOPex: Extended MOP: As defined in <xref
+                    target="I-D.ietf-roll-mopex"/>.
+            </t>
+
+            <t>
+                Capabilities: Additional features or capabilities that are
+                supported by the node.
+            </t>
+
+            <t>
+                Cap: Abbreviated term used for Capability.
+            </t>
+
+            <t>
+                Caps: Abbreviated term used for Capabilities.
+            </t>
+
+            <t>
+                DAO: DODAG Advertisement Object. An RPL message used to
+                advertise the target information in order to establish routing
+                adjacencies.
+            </t>
+
+            <t>
+                DIO: DODAG Information Object. An RPL message initiated by the
+                root and is used to advertise the network configuration
+                information.
+            </t>
+
+            <t>
+                Current parent: Parent 6LR node before switching to the new
+                path.
+            </t>
+
+            <t>
+                NPDAO: No-Path DAO. A DAO message which has target with lifetime
+                0.
+            </t>
+
+            <t>
+                Upstream path/direction: Path or direction from the node to the
+                Root in a DAG.
+            </t>
+
+            <t>
+                Downstream path/direction: Path or direction to the node from
+                the Root in a DAG.
+            </t>
+
+            <t>
+                This document uses terminology described in <xref
+                    target="RFC6550"/>. For the sake of readability all the
+                known relevant terms are repeated in this section.
+            </t>
+        </section>
+        <section anchor="cap-what" title="What are Capabilities?">
+            <t>
+                Currently RPL specification does not have a mechanism whereby a
+                node can signal the set of features that are available on its
+                end.  Such a mechanism could help the root to advertise its
+                capabilities and in response also determine some advanced
+                information about the capabilities of the joining nodes.  This
+                document defines Capabilities which could be supported by the
+                nodes and handshaked as part of RPL signaling. Capabilities are
+                embedded as an RPL Control Message Option as defined
+                in Section 6.7 of <xref target="RFC6550"/>.
+            </t>
+        </section>
+    </section>
+
+    <section anchor="requirements" title="Requirements for this document">
+        <t>
+            Following are the requirements considered for this documents:
+            <list style="format REQ%d:">
+                <t>
+                    Backwards compatibility. The new options and new fields in
+                    the DIO message should be backward compatible i.e. if there
+                    are nodes which support old MOPs they could still operate
+                    in their own instances.
+                </t>
+                <t>
+                    Optional capabilities handshake. Capabilities are features,
+                    possibly optional, which could be handshaked between the
+                    nodes and the root within an RPL Instance.
+                </t>
+                <t>
+                    Capabilities handshake could be optionally added with
+                    existing MOPs. Capabilities been optional in nature could
+                    be put to use with existing MOPs. Capabilities and
+                    MOP-extension is mutually independent i.e. a DIO can have a
+                    capabilities option, MOP-extension option or both in the
+                    same message.
+                </t>
+                <t>
+                    Capabilities could be explicitly queried.
+                </t>
+            </list>
+        </t>
+        <section anchor="cap-why" title="How are Capabilities different from existing RPL primitives?">
+            <t>
+                The Mode of Operation (MOP) field in RPL mandates the
+                operational requirement for the nodes joining as routers. MOP
+                and DIO Configuration Option is strictly controlled by the Root
+                node in RPL. Intermediate 6LRs cannot modify these fields.
+                Also, the MOP never changes for the lifetime of the RPL
+                Instance. Changes in DIO Configuration Option are possible but
+                are rare. Capabilities, on the other hand, might change
+                more dynamically.
+            </t>
+            <t>
+                RPL DIO message also carries routing metrics and constraints as
+                specified in <xref target="RFC6551"/>. Metrics and constraints
+                are used as part of objective function which aids in node's
+                rank calculation. A router may use capabilities carried in DIO
+                message as additional metrics/constraints. However,
+                capabilities have a larger scope and may be carried in other
+                messages other than DIO and can flow in both the directions
+                (upstream and downstream).
+            </t>
+        </section>
+    </section>
+
+    <section anchor="cap-how" title="Capabilities">
+    	<t>
+            Handling of Capabilities MUST be supported if the network uses
+            MOPex <xref target="I-D.ietf-roll-mopex"/>.
+        </t>
+        <t>
+            Note that capabilities and MOPex are mutually exclusive and it is
+            possible for an implementation to support either or both of the
+            options.
+        </t>
+        <section anchor="cap-option" title="Capability Control Message Option">
+            <t>
+            <figure align="center" anchor="cap-opt" title="Capabilities
+                Option"><artwork align="center"><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Type = TODO | Option Length | Capabilities TLVs
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+               ]]></artwork> </figure>
+            </t>
+            <t>
+                Multiple capabilities could be sent in the same message. The
+                length field allows the message parser to skip the capability
+                TLV parsing.
+            </t>
+            <t>
+                <figure align="center" anchor="cap-tlv" title="Capabilities
+                    TLV"><artwork align="center"><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   CapType     |     Len       |J|I|C|  Flags  |     ...
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+               ]]></artwork> </figure>
+            </t>
+            <t>
+                Every capability is identified by its type and it may have an
+                optional Capability Info. Note that a given capability may or
+                may not be diseminated with additional information depending on
+                the scope of the capability indicated by the I bit.
+            </t>
+            <t>
+                Len: 8-bit unsigned integer, representing the length
+                in octets of the TLV, not including the CapType, Length and
+                Flags fields.
+            </t>
+            <t>
+                J = Join only as leaf if capability not understood.
+            </t>
+            <t>
+                I = Ignore the message if this capability is not understood.
+            </t>
+            <t>
+                C = Flag indicating that the capability MUST be copied in the
+                downstream message.
+            </t>
+        </section>
+        <section anchor="cap-handshake" title="Capabilities Handshake">
+            <t>
+                The root node could advertise the set of capabilities it
+                supports in the DIO message. A node could take advantage of the
+                knowledge that the root supports a particular capability.
+                Similarly a node could advertise its capabilities in the DAO
+                message using the capability control message option defined in
+                this document. Capabilities advertised by non-root nodes are
+                strictly a subset of the capabilities advertised by the root.
+            </t>
+            <t>
+                In storing MOP, the DAO message from the 6LR could contain
+                multiple target options because of the DAO-Aggregation.  The
+                targets of the capabilities option are indicated by one or more
+                Target options that precede the Capabilities Option.  This
+                handling is similar to the Transit Information Option as
+                supported in Section 6.7.8. of <xref target = "RFC6550" />.
+            </t>
+        </section>
+    </section>
+    <section anchor="caps-query-rsp" title="Querying Capabilities">
+        <t>
+            Nodes may be interested in knowing the capabilities of another node
+            before taking an action. For e.g., Consider 
+            <xref target="I-D.ietf-roll-dao-projection"/>, the Root may want to 
+            know the capabilities of the nodes along a network segment before 
+            it initiates a projected DAO to install the routes along that
+            segment.
+        </t>
+        <t>
+            Caps can be carried in existing RPL Control messages as Control
+            Options, however Caps can also be queried explicitly. This section
+            provides a way for a node to query capability set of another node.
+            The capability query and subsequent response messages are directly
+            addressed between the two peers.
+        </t>
+        <!--
+        <t>
+            Requirements for capability query procedure:
+            <list hangIndent="4" style="hanging">
+                <t hangText="Query subset:">
+                    Possible to query a subset or whole capability set.
+                </t>
+                <t hangText="Multi-Message response:">
+                    If the capability set does not fit in a single message then
+                    it should be possible to send it across multiple messages.
+                </t>
+                <t hangText="Stateless operation:">
+                    Stateless capability query and response.
+                </t>
+                <t hangText="Async Caps update:">
+                    Update the capability asynchronously.
+                </t>
+                <t hangText="Handle Node reboots:">
+                    Capability set of a node may change on reboot (for e.g.,
+                    because of firmware update). It should be possible for the
+                    end nodes to determine this change.
+                </t>
+            </list>
+        </t>
+        -->
+        <section anchor="caps-query" title="Capability Query (CAPQ)">
+            <t> <figure align="center" anchor="capq_obj"
+                title="CAPQ base object"> <artwork align="center"><![CDATA[
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| RPLInstanceID |       Flags   |   reserved    | CAPQSequence  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Option(s)...
++-+-+-+-+-+-+-+-+
+                        ]]></artwork> </figure>
+            </t>
+            <t>
+                <list hangIndent="4" style="hanging">
+                    <!--
+                    <t hangText="NCSS:">
+                        One byte, Node Configuration State Sequence. The
+                        Last-NCSS represents the last known NCSS reported by the
+                        destination node. This value is set to zero if the
+                        last-NCSS is not known.
+                    </t>
+                    -->
+                    <t hangText="CAPQSequence:">
+                        One byte, Sequence number sent by the CAPQ sender which
+                        is reflected back by the responder in the CAPS message.
+                    </t>
+                    <t hangText="Flags:">
+                        One byte, set to zero by sender, ignored by receiver.
+                    </t>
+                    <t hangText="reserved:">
+                        One byte, set to zero by sender, ignored by receiver.
+                    </t>
+                </list>
+            </t>
+            <t>
+                CAPQ base object may be followed by one or more options. The
+                Capability Type List Control Option <xref target="cap-tlist"/>
+                is used to carry a set of capability types to query about.
+            </t>
+            <t>
+                If the sender does not send <xref target="cap-tlist"/> option, 
+                this would indicate that the node intends to query the 
+                capability type list <xref target="cap-tlist"/> supported 
+                by the target node.
+            </t>
+            <!--
+            <t>
+                NCSS is a sequence counter following the sequence operation
+                as mentioned in Section 7.2 of RFC6550 and is used by the node to
+                synchronize the capability set. The querying node will use this
+                to check if it has the latest capability set from the node. NCSS
+                may change only if any element of the capability set changes.
+                Note that NCSS is applicable for the whole capability set and
+                not individual capability. The idea is that the capability set
+                will change infrequently hence a common NCSS is sufficient for
+                all Caps. If the querying node is not aware of the last known
+                NCSS of the target node then it sets the NCSS to 0.
+            </t>
+            -->
+            <section anchor="capq-opts" title="Capability Type List Control Option">
+                <t>
+                    <figure align="center" anchor="cap-tlist"
+                    title="Capability Type List Control Option">
+                    <artwork align="center"> <![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Type = TODO | Option Length |  CapType1     |  CapType2     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  CapType3     |  .....
++-+-+-+-+-+-+-+-+-+-+-+-+
+                   ]]></artwork> </figure>
+                </t>
+            </section>
+            <section title="Secure CAPQ">
+                <t>
+                    A Secure CAPQ message follows the format in <xref
+                        target="RFC6550"/> Figure 7, where the base message
+                    format is the CAPQ message shown in <xref
+                        target="capq_obj"/>.
+                </t>
+            </section>
+            <section title="Base rules for CAPQ handling">
+                <t>
+                    A CAPQ message may get dropped or lost in the transit. The
+                    sender of CAPQ MAY retry the CAPQ message after some delay.
+                    The delay SHOULD NOT be less than 1 second.
+                </t>
+            </section>
+        </section>
+        <section anchor="caps-rsp" title="Capability Set Response (CAPS)">
+            <t> <figure align="center" anchor="caps_obj"
+                title="CAPS base object"><artwork align="center"><![CDATA[
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| RPLInstanceID |    Flags      |  Reserved     |  CAPQSequence |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Option(s)...
++-+-+-+-+-+-+-+-+
+                        ]]></artwork> </figure>
+            </t>
+            <t>
+                <list hangIndent="4" style="hanging">
+                    <t hangText="Flags:">
+                        One byte, set to zero by sender, ignored by receiver.
+                    </t>
+                    <t hangText="reserved:">
+                        One byte, set to zero by sender, ignored by receiver.
+                    </t>
+                    <t hangText="CAPQSequence:">
+                        One byte, Sequence number copied from CAPQSequence
+                        received in the CAPQ message.
+                    </t>
+                    <!--
+                    <t hangText="CAPQStatus:">
+                        One byte status value indicating status of the
+                        capability query. The status could be 0(indicating
+                        Success) or 1 (indicating subset of queried cap set not
+                        supported). If the status is 1 then the option 
+                        <xref target="cap-tlist"/> SHOULD be sent indicating 
+                        the cap types which are not supported.
+                    </t>
+                    -->
+                </list>
+            </t>
+            <t>
+                CAPS message SHOULD contain the capability set 
+                <xref target="cap-opt"/> queried by the CAPQ sender. If 
+                the target node does not support subset of the queried 
+                capabilities then the <xref target="cap-tlist"/> option
+                with the unsupported cap-types SHOULD be sent back 
+                indicating the queried capabilities not-supported by the 
+                target node. For an example, check 
+                <xref target="partial-cap"/>
+            </t>
+            <t>
+                If the CAPQ message does not contain any 
+                <xref target="cap-tlist"/> option then the receiver MUST 
+                respond with the cap types it supports using 
+                <xref target="cap-tlist"/>.
+            </t>
+            <t>
+                If the capability set cannot be transmitted in a single message
+                (for e.g., because of MTU limitations) then multiple CAPS
+                messages could be used. All the CAPS message MUST use the same
+                CAPQSequence number copied from the corresponding CAPQ message.
+            </t>
+            <section title="Secure CAPS">
+                <t>
+                    A Secure CAPS message follows the format in <xref
+                        target="RFC6550"/> Figure 7, where the base message
+                    format is the CAPS message shown in <xref
+                        target="caps_obj"/>.
+                </t>
+            </section>
+        </section>
+    </section>
+    <section anchor="caps-guidelines" title="Guidelines for defining new capabilities">
+        <t>
+            This section provides guidelines/recommendations towards defining
+            new capabilities. Note that the capabilities might be carried as
+            part of the multicast messaging such as DIO and hence the set
+            should be used in restrictive manner as far as possible.
+        </t>
+        <section anchor="caps-handling-flags" title="Handling Capability flags">
+            <t>
+                A node MUST drop or discard the message with an unknown
+                capability with 'D' flag set. The message MUST be discarded
+                silently.
+            </t>
+            <t>
+                The 'J' (join) flag can be set in context to a capability
+                either by a 6LR or the root. The 'J' flag indicates that if the
+                capability is not supported by a node then it can join the
+                instance only as a 6LN (or do not join as 6LR).
+            </t>
+            <t>
+                The 'C' (copy) flag is set by the node indicating that the
+                capabilities MUST be copied downstream by the node even if the
+                node does not understand the capability.
+            </t>
+            <section anchor="flags-rules" title="Rules to handle capabilities flag">
+                    <t hangText="How should node react to capability it does
+                        not support before joining the Instance?"> <vspace />
+                        On receiving a capability it does not support, the node
+                        MUST check the 'J' flag of the capability before
+                        joining the Instance. If the 'J' flag is set then it
+                        can only join as a 6LN.
+                    </t>
+                    <t hangText="How should node react to capability it does
+                        not support after joining the Instance?"> <vspace />
+                        If the node is operating as 6LR and subsequently it receives 
+                            a capability from its preferred parent which it does
+                            not understand with 'J' flag set, then the node has
+                            to switch itself to 6LN mode. During switching the
+                            node needs to inform its downstream peers of its
+                            changed status by sending a DIO with infinite rank
+                            as mentioned in RFC6550. Alternatively, a node may
+                            decide to switch to another parent with compatible
+                            and known capabilities.
+                    </t>
+                    <t hangText="When to use and when not to use
+                        Capabilities?"> <vspace /> Capabilities are used to
+                        indicate a feature that is supported by the node.
+                        Capabilities are not meant for configuration management
+                        for e.g., setting a threshold.
+                    </t>
+            </section>
+        </section>
+    </section>
+    <section anchor="roll-caps" title="Node Capabilities">
+        <section anchor="cap-ind" title="Capability Indicators">
+            <t> 
+                Capability Indicators indicates the capabilities supported by
+                the node in the form of simple flags. Capabilities who do not
+                have additional information to be specified could make use of
+                these flags to indicate their support.
+            </t>
+            <section title="Format of Capability Indicators">
+                <t>
+                    <figure align="center" anchor="cap-ind-tlv" title="Capability Indicators TLV">
+                        <artwork align="center"><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| CapType=0x01  |     Len       |J|I|C|   Flags |T|..Indicators..
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                            ]]></artwork> </figure>
+                </t>
+                <t>
+                    Flags: LRs MUST set it to 0. I bit will always be set to 0.						
+                </t>
+                <t>
+                    T flag (Bit 1): Indicates whether the node supports 6LoRH
+                    [RFC8138].
+                </t>
+            </section>
+        </section>
+        <section title="Routing Resource Capability">
+            <t>
+                Storing mode of operation requires each intermediate router
+                in the LLN to maintain routing states' information in the
+                routing table. LLN routers typically operate with
+                constraints on processing power, memory, and energy
+                (battery power). Memory limits the number of routing states
+                an LR and BR can maintain.  When the routing table of an LR
+                or BR is full, it will either reject the new DAO messages
+                received or will use some replacement policy to remove a
+                routing entry and add the new one. Rejection of DAO
+                messages will lead to an increase in DAO message
+                transmission that impacts the energy and network
+                convergence time.  Routing state replacement leads to
+                downward path downtime.
+            </t>
+            <t>
+                One possible way to solve problems due to routing table
+                size constraint is to use this information to add neighbors
+                to the DAO parent set. Routing resource capability can be
+                used by LR and BR to advertise their current routing table
+                usage details in the network. LR or LNs in LLN can use this
+                information in the selection of the DAO parent set. PCE can
+                use this information to select intermediate routers for the
+                projected routes. Routing Resource is an optional capability.
+            </t>
+            <t>
+                Routing resource capabablity sent in DIO message has link
+                local scope and it MUST not be forwarded. The 'C' bit of this
+                capability MUST be set to 0.
+            </t>
+            <section title="Format of Routing Resource Capability">
+                <t>
+                    <figure align="center" anchor="rtres-tlv" title="Routing Resource Capability TLV">
+                        <artwork align="center"><![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| CapType=0x02  |    Len=3      |J|I|C|  Flags  |  Reserved     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Total Capacity         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                            ]]></artwork> </figure>
+                </t>
+                <t>
+                    Type: 0x02.
+                </t>
+                <t>
+                    Flags: I bit MUST be set to 0. C bit MUST be set to 0.
+                </t>
+                <t>
+                    Len: 8-bit unsigned integer, representing the length
+                    in octets of the option, not including the Option Type
+                    and Length/flags fields.
+                </t>
+                <t>
+                    Resvd: 8-bit unused field. It MUST be initialized to
+                    zero by the sender and MUST be ignored by the receiver.
+                </t>
+                <t>
+                    Total Capacity: 16 bit unsigned integer representing
+                    the routing table size.						
+                </t>
+            </section>
+        </section>
+        <!--
+        <section title="Neighbor Cache Capability">
+            <t>
+                A neighbor cache maintains neighboring one-hop connected
+                nodes information such as MAC address, link-local IP
+                address and other reachability state information needed for
+                layer two communication.Node density has direct
+                implications on the neighbor cache. In the constrained
+                network scenario the size of the neighbor cache will be
+                limited. Thus there are chances that a node may not be able
+                to store all the neighboring nodes in its cache and use
+                replacement algorithms to evict some of the entries to
+                accommodate the new one.  If the replaced neighbor has
+                installed a DAO route on it then it can lead to packet loss
+                or additional address resolution message exchange.  To
+                avoid unnecessary replacement of neighbor cache entries
+                neighbor cache management policy <xref
+                    target="I-D.ietf-lwig-nbr-mgmt-policy"/> proposes a
+                solution that will put a restriction on the connectivity to
+                immediate neighbor depending upon the type of neighbor.
+                But this won't solve the problem unless until the
+                availability of neighbor cache is not taken into
+                consideration while selecting the DAO parent set.
+            </t>
+            <t>
+                Neighbor Cache capability can be used by LR and BR to
+                advertise their neighbor cache size information. This
+                capablity information has only link scope and should not be
+                advertised in the entire network. 
+            </t>
+            <section title="Format of Neighbor Cache Capability">
+            </section>
+        </section>
+        -->
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+        <t>
+            Thanks to Georgios Papadopoulos, Li Zhao for early review and
+            feedback.
+        </t>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+        <t>
+            IANA is requested to allocate new codes for the CAPQ and CAPS
+            messages from the RPL Control Codes registry.
+        </t>
+
+        <texttable title="New RPL Control Messages">
+            <ttcol align='center'>Code</ttcol>
+            <ttcol align='center'>Description</ttcol>
+            <ttcol align='center'>Reference</ttcol>
+
+            <c>TBD1</c>
+            <c>Capability Query</c>
+            <c>This document</c>
+            <c>TBD2</c>
+            <c>Capability Response</c>
+            <c>This document</c>
+            <c>TBD3</c>
+            <c>Secure Capability Query</c>
+            <c>This document</c>
+            <c>TBD4</c>
+            <c>Secure Capability Response</c>
+            <c>This document</c>
+        </texttable>
+
+        <t>
+            The MSB of the codes allocated to "Secure" messages above should be
+            set.
+        </t>
+        <section title="New option: Capabilities">
+            <t>
+                New entry is required for supporting new Capabilities
+                option and new Capability Type List Option in the "RPL Control
+                Message Options" space <xref target="RFC6550"/>.
+            </t>
+            <texttable title="New options">
+                <ttcol align='center'>Value</ttcol>
+                <ttcol align='center'>Meaning</ttcol>
+                <ttcol align='center'>Reference</ttcol>
+
+                <c>TODO</c>
+                <c>Capability Option</c>
+                <c>This document</c>
+
+                <c>TODO</c>
+                <c>Capability Type List Option</c>
+                <c>This document</c>
+            </texttable>
+        </section>
+        <section title="Capability Sub-Type">
+            <t>
+                IANA is requested to create a registry for the Capabilities
+                Type as described in <xref target="cap-tlv"/> of this
+                document. This registry should be located in TODO.  New
+                Capabilities types may be allocated only by an IETF review.
+            </t>
+            <texttable title="Type">
+                <ttcol align='center'>Value</ttcol>
+                <ttcol align='center'>Meaning</ttcol>
+                <ttcol align='center'>Reference</ttcol>
+
+                <c>0x01</c>
+                <c>Capability Indicators</c>
+                <c>This document</c>
+
+                <c>0x02</c>
+                <c>Routing Resource Capability</c>
+                <c>This document</c>
+            </texttable>
+        </section>
+        <section title="New Registry for CAPQ Flags">
+            <t>
+                IANA is requested to create a registry for the Capabilities
+                flags as described in <xref target="caps-query"/> of this
+                document. This registry should be located in TODO.  New
+                Capabilities flags may be allocated only by an IETF review.
+                Currently no flags are defined by this document. Each value is
+                tracked with the following qualities:
+                <list style="symbols">
+                    <t>Flag</t>
+                    <t>Description</t>
+                    <t>Defining RFC</t>
+                </list>
+            </t>
+        </section>
+        <!--
+        <section title="New Registry for the CAPQStatus field">
+            <t>
+                IANA is requested to create a registry for the 8-bit CAPQ
+                Status field <xref target="caps-rsp"/>. This registry
+                should be located in existing category of "Routing Protocol for
+                Low Power and Lossy Networks (RPL)".
+            </t>
+            <t>
+                New Status values may be allocated only by an IETF Review. Each
+                value is tracked with the following qualities:
+            </t>
+            <t>
+                <list style="symbols">
+                    <t>Status Code</t>
+                    <t>Description</t>
+                    <t>Defining RFC</t>
+                </list>
+            </t>
+            <t>
+                The following values are currently defined:
+            </t>
+            <texttable title="CAPQStatus Codes">
+                <ttcol align='center'>Status Code</ttcol>
+                <ttcol align='center'>Description</ttcol>
+                <ttcol align='center'>Reference</ttcol>
+                <c>0</c>
+                <c>OK</c>
+                <c>This document</c>
+                <c>1</c>
+                <c>Partial or Full queried capability set not supported</c>
+                <c>This document</c>
+            </texttable>
+        </section>
+        -->
+        <section title="New Registry for Capabilities Flags">
+            <t>
+                IANA is requested to create a registry for the Capabilities
+                flags as described in <xref target="cap-why"/> of this
+                document. This registry should be located in TODO.  New
+                Capabilities flags may be allocated only by an IETF review.
+                Currently no flags are defined by this document. Each value is
+                tracked with the following qualities:
+                <list style="symbols">
+                    <t>Flag</t>
+                    <t>Description</t>
+                    <t>Defining RFC</t>
+                </list>
+            </t>
+        </section>
+        <section title="New Registry for Capabilities Indicators">
+            <t>
+                IANA is requested to create a registry for the Capabilities
+                Indicators as described in <xref target="cap-ind"/> of this
+                document. This registry should be located in TODO.  New
+                Capabilities indicators may be allocated only by an IETF review.
+                Each value is tracked with the following qualities:
+                <list style="symbols">
+                    <t>Flag</t>
+                    <t>Description</t>
+                    <t>Defining RFC</t>
+                </list>
+            </t>
+        </section>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+        <t>
+            The options defined in this document are carried in the base
+            message objects as defined in <xref target = "RFC6550" />. The RPL
+            control message options are protected by the same security
+            mechanisms that protect the base messages.
+        </t>
+        <t>
+            Capabilities flag can reveal that the node has been upgraded or is
+            running a old feature set. This document assumes that the base
+            messages that carry these options are protected by RPL security
+            mechanisms and thus are not visible to a malicious node.
+        </t>
+        <t>
+            [TODO] implications of malicious attack involving setting the
+                capability flags.
+        </t>
+    </section>
+</middle>
+
+<back>
+    <references title="Normative References">
+        <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+        &RFC2119;
+        &RFC6550;
+        &RFC8138;
+        <?rfc include='reference.I-D.ietf-roll-mopex'?>
+    </references>
+
+    <references title="Informative References">
+        <!-- Here we use entities that we defined at the beginning. -->
+        &RFC6551;
+        <?rfc include='reference.I-D.ietf-roll-dao-projection'?>
+        <?rfc include='reference.I-D.thubert-roll-turnon-rfc8138'?>
+        <?rfc include='reference.I-D.ietf-lwig-nbr-mgmt-policy'?>
+    </references>
+
+    <section anchor="app-additional" title="Capability Handshake Example">
+        <section title="Query supported Cap Types">
+            <t>
+                <figure align="center" anchor="query-cap-types"
+                    title="Query supported Cap Types"><artwork align="center"><![CDATA[
+Root                             6LR/6LN
+|                                   |
+|  CAPQ(seq=1, opts=nil)            |
+|---------------------------------->|
+|                                   |
+|                                   |
+|  CAPS(seq=1, opts={CapTypeList})  |
+|<----------------------------------|
+|                                   |
+                    ]]></artwork> </figure>
+            </t>
+            <t>
+                CAPQ message with no CapTypeList Option results in the peer
+                responding with a CAPS message with CapTypeList Option indicating
+                all the capability set it supports.
+            </t>
+        </section>
+        <section title="Query specific Cap Set">
+            <t>
+                <figure align="center" anchor="cap-query-specific-cap"
+                    title="Query specific Cap Set"><artwork align="center"><![CDATA[
+Root                             6LR/6LN
+|                                   |
+|  CAPQ(seq=2,                      |
+|   opts={CapTypeList=[Cap1, Cap2]})|
+|---------------------------------->|
+|                                   |
+|                                   |
+|  CAPS(seq=2,                      |
+|       opts={Cap1=Cap1Value,       |
+|             Cap2=Cap2Value})      |
+|<----------------------------------|
+|                                   |
+                    ]]></artwork> </figure>
+            </t>
+            <t>
+                This flow indicates the case where the Root probes for specific
+                Capabilities of the peer node and the peer node responds with the
+                value of indicated Capability set.
+            </t>
+        </section>
+        <section anchor="partial-cap" title="CAPS with partial Cap Set">
+            <t>
+                <figure align="center" title="Partial Capability Set handshake">
+                    <artwork align="center"><![CDATA[
+Root                             6LR/6LN
+|                                   |
+|  CAPQ(seq=3,                      |
+|   opts={CapTypeList=[Cap1, Cap2,  |
+|                      Cap3, Cap4]})|
+|---------------------------------->|
+|                                   |
+|                                   |
+|  CAPS(seq=3,                      |
+|    opts={Cap2=Cap2Value,          |
+|          Cap3=Cap3Value,          |
+|          CapTypeList=[Cap1,Cap4]})|
+|<----------------------------------|
+|                                   |
+                    ]]></artwork> </figure>
+            </t>
+            <t>
+                Assume that Root queries for capabilities {Cap1, Cap2, Cap3, Cap4}
+                from the peer node. However the peer node does not support or does
+                not understand capability {cap1, cap4}. In this case the peer node
+                will respond back with value of Cap2 and Cap3 (which it understands)
+                and set the CapTypeList option with {Cap1, Cap4} type.
+            </t>
+        </section>
+    </section>
+</back>
+</rfc>
